@@ -5,11 +5,12 @@ plugins {
 }
 
 android {
-    namespace = "com.example.plustalk1"
+    namespace = "com.choijihyuk0609.plustalk1"
     compileSdk = 35
 
+
     defaultConfig {
-        applicationId = "com.example.plustalk1"
+        applicationId = "com.choijihyuk0609.plustalk1"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
@@ -21,6 +22,16 @@ android {
         }
     }
 
+
+    signingConfigs {
+        create("release") {
+            storeFile = file("keystore/PlusTalkKey.jks")  // keystore 파일 경로
+            storePassword = "12345678"          // keystore 파일의 비밀번호
+            keyAlias = "key0"                    // keystore 내에서 사용할 키 alias
+            keyPassword = "12345678"              // 해당 키의 비밀번호
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -28,6 +39,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
