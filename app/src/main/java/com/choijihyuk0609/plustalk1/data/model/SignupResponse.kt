@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 data class SignupResponse(
     val status: Int,
     val message: String,
-    val datas: SignupDatas?
+    val data: SignupDatas?
 )
 
 data class SignupDatas(

@@ -54,39 +54,105 @@ class SignupFragment : Fragment() {
             }
         }
     }
-
-    fun performSignup(email : String, password : String){
+    fun performSignup(email: String, password: String) {
         val signupRequest = SignupRequest(email, password)
         val retrofitCall = AuthActivity.RetrofitInstance.apiService.signup(signupRequest)
-        retrofitCall.enqueue(object: Callback<SignupResponse> {
+
+        retrofitCall.enqueue(object : Callback<SignupResponse> {
             override fun onResponse(
                 call: Call<SignupResponse>,
                 response: Response<SignupResponse>
             ) {
+                if (response.isSuccessful) {
+                    // 회원가입 성공 처리
+                    val responseBody = response.body()
+                    val status = responseBody?.status
+                    val message = responseBody?.message
+                    val data = responseBody?.data
+                    val email = data?.email
+                    val signupTime = data?.signUpTime
+                    val authority = data?.authority
 
-                if(response.isSuccessful) {
+                    Log.d("kkang", "status: $status \n message: $message \n data: $data \n" +
+                            "email: $email \n signupTime: $signupTime \n authority: $authority")
+
+                    if (status == 200) {
+                        Toast.makeText(requireContext(), "Signed up successfully", Toast.LENGTH_SHORT).show()
+                        parentFragmentManager.beginTransaction()
+                            .replace(R.id.fragment_container, SigninFragment())
+                            .addToBackStack(null)
+                            .commit()
+                    }
+
+                } else {
+                    // 회원가입 실패 처리 (예: 이메일 중복)
+                    if (response.code() == 409) {
+                        Toast.makeText(requireContext(), "The id already exists", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(requireContext(), "Failed Signing up", Toast.LENGTH_SHORT).show()
+                    }
+
+                    Log.d("kkang", "Signup failed with code: ${response.code()} and message: ${response.errorBody()?.string()}")
+                }
+            }
+
+            override fun onFailure(call: Call<SignupResponse>, t: Throwable) {
+                Log.e("kkang", "Signup request failed", t)
+                Toast.makeText(requireContext(), "Network error, please try again", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+}
+
+
+/*
+* {
+            override fun onResponse(
+                call: Call<SignupResponse>,
+                response: Response<SignupResponse>
+            ) {
+                Log.d("kkang", "retrofitCall")
+                Log.d("kkang", "${response.body( )}")
+                if(response != null) {
+                    Log.d("kkang", "response.isSuccessful")
                     val signupResponse = response.body( )
+
                     if(signupResponse != null){
-                        val email     = signupResponse.datas?.email
-                        val password  = signupResponse.datas?.signUpTime
-                        val authority = signupResponse.datas?.authority
-                        if(authority == "ROLE_MEMBER"){
+                        val email     = signupResponse.data?.email
+                        val password  = signupResponse.data?.signUpTime
+                        val authority = signupResponse.data?.authority
+                        if(signupResponse.status == 200) {
+                            Log.d("kkang","status is 200")
                             //behaviours when signup is successful
-                            Toast.makeText(requireContext( ), "Signed up successfully", Toast.LENGTH_SHORT).show( )
+                            Toast.makeText(
+                                requireContext(),
+                                "Signed up successfully",
+                                Toast.LENGTH_SHORT
+                            ).show()
                             parentFragmentManager.beginTransaction()
                                 .replace(R.id.fragment_container, SigninFragment())
                                 .addToBackStack(null)
                                 .commit()
+                        } else if( signupResponse.status == 409){
+                            Log.d("kkang","status is 409")
+                            Toast.makeText(
+                                requireContext(),
+                                "The id already exists",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }else {
+                            Log.d("kkang","Failed Signup")
                             Toast.makeText(requireContext( ), "Failed Signing up", Toast.LENGTH_SHORT).show( )
                         }
                     }
+                } else {
+                    Log.d("kkang", "Failed")
+                    Log.d("kkang", "${response.body()}")
                 }
             }
 
             override fun onFailure(call: Call<SignupResponse>, t: Throwable) {
                 TODO("Not yet implemented")
             }
-        })
-    }
-}
+        }
+* */
