@@ -92,8 +92,12 @@ class SigninFragment : Fragment(R.layout.fragment_signin) {
 
                     }
                 } else {
-                    // Handle the error response
-                    Toast.makeText(requireContext(), "Signin failed: ${response.message()}", Toast.LENGTH_SHORT).show()
+                    if (response.code() == 401){
+                        Toast.makeText(requireContext(), "We can't find your id registered.", Toast.LENGTH_SHORT).show()
+                    } else {
+                        // Handle the error response
+                        Toast.makeText(requireContext(), "Signin failed: ${response.message()}", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
             override fun onFailure(call: Call<SigninResponse>, t: Throwable) {
