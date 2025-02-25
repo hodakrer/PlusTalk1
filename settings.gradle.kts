@@ -13,7 +13,8 @@ pluginManagement {
 
     plugins {
         id("com.android.application") version "8.1.4" // Ensure the correct AGP version
-        id("org.jetbrains.kotlin.android") version "1.9.10" // Match Kotlin version in your project
+        id("org.jetbrains.kotlin.android") version "1.9.10"
+
     }
 }
 dependencyResolutionManagement {
@@ -26,4 +27,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "Plus Talk 1"
 include(":app")
- 

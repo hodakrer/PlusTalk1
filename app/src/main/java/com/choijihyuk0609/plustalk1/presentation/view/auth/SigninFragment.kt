@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -48,7 +49,7 @@ class SigninFragment : Fragment(R.layout.fragment_signin) {
         //Handling Button signup -> Move to SignupFragment
         signupButton.setOnClickListener {
             parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, SignupFragment())
+                .replace(R.id.container, SignupFragment())
                 .addToBackStack(null)
                 .commit()
         }

@@ -52,8 +52,6 @@ class FriendFragment : Fragment(), OnRecyclerItemClickListener {
             inflater, R.layout.fragment_friend, container, false
         )
         //Initialize FriendList
-
-
         binding.frFriendRecyclerView.layoutManager = LinearLayoutManager(requireContext( ) )
         binding.frFriendRecyclerView.adapter = FriendAdapter(datas, requireContext(),this)
         binding.frFriendRecyclerView.addItemDecoration(
@@ -65,7 +63,6 @@ class FriendFragment : Fragment(), OnRecyclerItemClickListener {
 
         return binding.root
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -79,6 +76,33 @@ class FriendFragment : Fragment(), OnRecyclerItemClickListener {
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return when (menuItem.itemId) {
+                    R.id.action_item_searching_friend -> {
+                        parentFragmentManager.beginTransaction()
+                            .replace(R.id.container, AddFriendFragment( ) )
+                            .addToBackStack(null)
+                            .commit()
+                        true
+                    } else -> false
+                }
+
+            }
+        }, viewLifecycleOwner)
+    }
+
+    /*
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        //controlling actionbar
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_fragment_friend_searching_friend, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+
                     R.id.action_item_searching_friend -> {
                         val searchView = menuItem.actionView as? SearchView
                         searchView?.apply {
@@ -116,12 +140,13 @@ class FriendFragment : Fragment(), OnRecyclerItemClickListener {
                             Log.e("FriendFragment", "SearchView is null")
                         }
                         true
+
                     }
                     else -> false
                 }
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
-    }
+    }*/
 
     //Implementing SoftKeyboard
     private fun showKeyboard(view: View) {

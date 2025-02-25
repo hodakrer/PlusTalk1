@@ -16,15 +16,16 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/frSignup_emailInput"
-        app:layout_constraintVertical_chainStyle="spread"/>
+        app:layout_constraintBottom_toTopOf="@id/frSignup_emailInput"/>
 
     <EditText
         android:id="@+id/frSignup_emailInput"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="Email"
+        android:inputType="textEmailAddress"
         app:layout_constraintTop_toBottomOf="@id/SignupTitle"
+        app:layout_constraintBottom_toTopOf="@id/frSignup_passwordInput"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -33,7 +34,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="Password"
+        android:inputType="textPassword"
         app:layout_constraintTop_toBottomOf="@id/frSignup_emailInput"
+        app:layout_constraintBottom_toTopOf="@id/frSignup_SignupButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -42,9 +45,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Sign Up"
-        app:layout_constraintTop_toBottomOf="@id/frSignup_passwordInput"
+        app:layout_constraintTop_toBottomOf="@id/frSignup_SignupButton"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

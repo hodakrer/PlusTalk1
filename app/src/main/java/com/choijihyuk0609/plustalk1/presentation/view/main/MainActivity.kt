@@ -152,7 +152,12 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
+    fun navigateToFriendFragment() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.container, FriendFragment())
+            .addToBackStack(null)
+            .commit()
+    }
 
 
 }
