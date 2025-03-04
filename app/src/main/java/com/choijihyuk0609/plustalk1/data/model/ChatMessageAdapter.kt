@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.choijihyuk0609.plustalk1.R
 
 
-class ChatMessageAdapter(private val messageList: List<ChatMessage>) :
+class ChatMessageAdapter(private val messageList: List<ChatMessage>, private val memberEmail: String) :
     RecyclerView.Adapter<ChatMessageAdapter.ChatViewHolder>() {
 
     class ChatViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -26,10 +26,13 @@ class ChatMessageAdapter(private val messageList: List<ChatMessage>) :
         val messages = messageList[position]
 
         // 유저의 메시지 여부 확인
-        val isUserMessage = messages.isSentByUser
+        var isUserMessage = false
+        if (memberEmail == messages.senderEmail) {
+            isUserMessage = true
+        }
 
         // 텍스트 설정
-        holder.textViewMessage.text = messages.message
+        holder.textViewMessage.text = messages.messageText
 
         // 레이아웃 파라미터 설정
         val params = holder.textViewMessage.layoutParams as ConstraintLayout.LayoutParams

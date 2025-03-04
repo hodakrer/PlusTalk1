@@ -2,6 +2,8 @@ package com.choijihyuk0609.plustalk1.presentation.view.main
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -25,10 +27,38 @@ import retrofit2.Response
 
 
 class ChatRoomFragment : Fragment() {
-    private var memberEmail: String? = null
+
     private lateinit var recyclerView: RecyclerView
-    private lateinit var chatAdapter: ChatMessageAdapter
+    private lateinit var chatMessageAdapter: ChatMessageAdapter
     private val messageList = mutableListOf<ChatMessage>()
+    private lateinit var editTextChat: EditText
+
+    private var memberEmail: String? = null
+    private var memberFriendEmail: String? = null
+    private var chatRoomId: String? = null
+
+
+    companion object {
+        fun newInstance(email: String, friend: String, chatroomid: String): ChatRoomFragment {
+            val fragment = ChatRoomFragment()
+            val args = Bundle()
+            args.putString("member", email)
+            args.putString("friend", friend)
+            args.putString("chatroomid", chatroomid)
+            fragment.arguments = args
+            return fragment
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // ✅ arguments에서 값 가져오기 (올바른 방식)
+        arguments?.let {
+            memberEmail = it.getString("member")
+            memberFriendEmail = it.getString("friend")
+            chatRoomId = it.getString("chatroomid")
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,19 +69,21 @@ class ChatRoomFragment : Fragment() {
         recyclerView = view.findViewById(R.id.recyclerViewChat)
         editTextChat = view.findViewById(R.id.editTextChat)
 
-        // RecyclerView 초기화
-        chatMessageAdapter = ChatMessageAdapter(messageList)
-        recyclerView.adapter = chatMessageAdapter
-        recyclerView.layoutManager = LinearLayoutManager(context)
-
+        // Null 체크 후 RecyclerView 초기화
+        memberEmail?.let { email ->
+            chatMessageAdapter = ChatMessageAdapter(messageList, email)
+            recyclerView.adapter = chatMessageAdapter
+            recyclerView.layoutManager = LinearLayoutManager(context)
+        } ?: run {
+            Log.e("ChatRoomFragment", "memberEmail is null")
+        }
         // 채팅 메시지 로드
-        loadChatMessages()
+        loadChatMessages(memberEmail!!, memberFriendEmail!!, chatRoomId!!)
 
         return view
     }
 
-    private lateinit var editTextChat: EditText
-    private lateinit var chatMessageAdapter: ChatMessageAdapter
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -60,7 +92,7 @@ class ChatRoomFragment : Fragment() {
 
         // RecyclerView 설정
         val recyclerView: RecyclerView = view.findViewById(R.id.recyclerViewChat)
-        chatMessageAdapter = ChatMessageAdapter(messageList)
+        chatMessageAdapter = ChatMessageAdapter(messageList, memberEmail!!)
         recyclerView.adapter = chatMessageAdapter
 
         // 엔터키 눌렀을 때 메시지 처리
@@ -68,7 +100,15 @@ class ChatRoomFragment : Fragment() {
             if (actionId == EditorInfo.IME_ACTION_SEND) {
                 val messageText = editTextChat.text.toString().trim()
                 if (messageText.isNotEmpty()) {
+
+                    Log.d("kkang", "messageText: ${messageText}")
+                    Log.d("kkang", "chatRoom Info")
+                    Log.d("kkang", "memberEmail: ${memberEmail}")
+                    Log.d("kkang", "memberFriendEmail: ${memberFriendEmail}")
+                    Log.d("kkang", "chatRoomId: ${chatRoomId}")
+
                     sendMessageToServer(messageText)
+                    loadChatMessages(memberEmail!!, memberFriendEmail!!, chatRoomId!!)
                     editTextChat.text.clear() // 입력 필드 초기화
                 }
                 true
@@ -76,18 +116,31 @@ class ChatRoomFragment : Fragment() {
                 false
             }
         }
-
     }
 
-    private fun loadChatMessages() {
-        memberEmail = arguments?.getString("memberEmail")
-        // SharedPreferences에서 채팅방 ID 가져오기
-        val chatRoomId = requireContext()
-            .getSharedPreferences("CHATTINGROOMID", Context.MODE_PRIVATE)
-            .getString(memberEmail, null)
+    private val handler = Handler(Looper.getMainLooper())
+    private val refreshRunnable = object : Runnable {
+        override fun run() {
+            loadChatMessages(memberEmail!!, memberFriendEmail!!, chatRoomId!!)
+            handler.postDelayed(this, 1000) // 1초마다 실행
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadChatMessages(memberEmail!!, memberFriendEmail!!, chatRoomId!!) // 화면에 나타나면 바로 실행
+        handler.post(refreshRunnable) // 주기적 실행 시작
+    }
+
+    override fun onPause() {
+        super.onPause()
+        handler.removeCallbacks(refreshRunnable) // 화면에서 사라지면 중단
+    }
+
+    private fun loadChatMessages(memberEmail : String, memberFriendEmail : String, chatRoomId: String) {
 
         if (memberEmail != null && chatRoomId != null){
-            val chatMessageListAllRequest = ChatMessageListAllRequest(memberEmail!!, chatRoomId)
+            val chatMessageListAllRequest = ChatMessageListAllRequest(memberEmail, chatRoomId)
 
             MainActivity.RetrofitInstance.apiService.listAllChatMessage(chatMessageListAllRequest)
                 .enqueue(object : Callback<ChatMessageListAllResponse> {
@@ -97,14 +150,10 @@ class ChatRoomFragment : Fragment() {
                     ) {
                         if (response.isSuccessful) {
                             val chatMessagesData = response.body()?.data
+                            Log.d("kkang", "ChatMessagesData: ${chatMessagesData}")
                             if (chatMessagesData != null) {
                                 messageList.clear()
-                                messageList.addAll(chatMessagesData.map { data ->
-                                    ChatMessage(
-                                        message = if (data.isImage == true) data.imageUrl else data.messageText, // 이미지 메시지 처리
-                                        isSentByUser = data.senderEmail == memberEmail // 유저 본인 여부 판별
-                                    )
-                                })
+                                messageList.addAll(chatMessagesData)
                                 chatMessageAdapter.notifyDataSetChanged()
                             }
                         } else {
@@ -123,14 +172,13 @@ class ChatRoomFragment : Fragment() {
     }
 
     private fun sendMessageToServer(messageText: String) {
-        val memberEmail = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
-            .getString("email", null) ?: return
 
-        val chatRoomId = "your_chat_room_id_here" // 실제 채팅방 ID로 바꿔주세요
+        val sharedPref = requireContext().getSharedPreferences(requireContext().getString(R.string.CHATTINGROOM), Context.MODE_PRIVATE)
+        val chatRoomId = sharedPref.getString(memberEmail, "none")
 
         val request = ChatMessageCreateRequest(
-            senderEmail = memberEmail,
-            chatRoomId = chatRoomId,
+            senderEmail = memberEmail!!,
+            chatRoomId = chatRoomId!!,
             messageId = (System.currentTimeMillis() % Int.MAX_VALUE).toInt(), // 임시 ID
             isImage = false,
             messageText = messageText
@@ -143,7 +191,7 @@ class ChatRoomFragment : Fragment() {
                     response: Response<ChatMessageCreateResponse>
                 ) {
                     if (response.isSuccessful && response.body()?.status == 200) {
-                        loadChatMessages() // 서버에서 메시지 목록 다시 불러오기
+                        loadChatMessages(memberEmail!!, memberFriendEmail!!, chatRoomId) // 서버에서 메시지 목록 다시 불러오기
                     } else {
                         Toast.makeText(context, "메시지 전송 실패", Toast.LENGTH_SHORT).show()
                     }

@@ -13,14 +13,11 @@ class AuthActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_auth)
 
+        // SigninFragment를 초기 화면으로 로드
         if (savedInstanceState == null) {
-            // Create a new instance of the LoginFragment
-            val signinFragment = SigninFragment()
-
-            // Use the FragmentManager to replace the container with the fragment
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, signinFragment)
-                .commit()
+            val transaction = supportFragmentManager.beginTransaction()
+            transaction.replace(R.id.fragment_container, SigninFragment()) // Fragment를 지정한 container에 추가
+            transaction.commit()
         }
 
     }

@@ -49,7 +49,7 @@ class SigninFragment : Fragment(R.layout.fragment_signin) {
         //Handling Button signup -> Move to SignupFragment
         signupButton.setOnClickListener {
             parentFragmentManager.beginTransaction()
-                .replace(R.id.container, SignupFragment())
+                .replace(R.id.fragment_container, SignupFragment())
                 .addToBackStack(null)
                 .commit()
         }

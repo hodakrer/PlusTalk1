@@ -16,13 +16,13 @@ import com.choijihyuk0609.plustalk1.data.model.ChatAdapter
 import com.choijihyuk0609.plustalk1.data.model.ChatRoom
 import com.choijihyuk0609.plustalk1.data.model.ChatRoomListRequest
 import com.choijihyuk0609.plustalk1.data.model.ChatRoomListResponse
-import com.choijihyuk0609.plustalk1.data.model.OnRecyclerItemClickListener
+import com.choijihyuk0609.plustalk1.data.model.OnChatRecyclerItemClickListener
 import com.choijihyuk0609.plustalk1.databinding.FragmentChatBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class ChatFragment : Fragment(), OnRecyclerItemClickListener {
+class ChatFragment : Fragment(), OnChatRecyclerItemClickListener {
     private lateinit var binding: FragmentChatBinding
     private var datas: MutableList<ChatRoom> = mutableListOf( )
 
@@ -40,25 +40,34 @@ class ChatFragment : Fragment(), OnRecyclerItemClickListener {
             DividerItemDecoration(requireContext( ),
                 LinearLayoutManager.VERTICAL)
         )
-
         loadChatRoomList()
-
         return binding.root
     }
 
-    override fun onRecyclerItemClick(email: String) {
+    override fun onRecyclerItemClick(email: String, friend: String, chatRoomId: String) {
         Log.d("kkang", "onRecyclerItemClick and Email: ${email}")
 
         val bundle = Bundle()
+        // 값이 null인 경우에는 Fragment를 생성하지 않도록 처리
         bundle.putString("member", email)
+        bundle.putString("friend", friend)
+        bundle.putString("chatroomid", chatRoomId)
 
-        // Create an instance of ChatRoomFragment
-        val chatRoomFragment = ChatRoomFragment()
+
+        // 프래그먼트를 생성할 때 bundle을 인자로 넘김
+        val chatRoomFragment = ChatRoomFragment.newInstance(email, friend, chatRoomId)
+
+        // arguments를 설정하기 전에 fragment를 생성
         chatRoomFragment.arguments = bundle
+        Log.d("kkang", "번들을 꺼내봅시다. member: ${bundle.getString("member") }")
+        Log.d("kkang", "번들을 꺼내봅시다. friendName: ${bundle.getString("friend") }")
+        Log.d("kkang", "번들을 꺼내봅시다. chatRoom: ${bundle.getString("chatroomid") }")
+        // 프래그먼트 교체
         parentFragmentManager.beginTransaction()
-            .replace(R.id.container, chatRoomFragment)  // Replace with your container's ID
-            .addToBackStack(null)  // Optionally add to back stack for navigating back
+            .replace(R.id.container, chatRoomFragment)  // container의 ID로 교체
+            .addToBackStack(null)  // 뒤로 가기 스택에 추가
             .commit()
+        Log.d("kkang", "이거 나오면 chatFragment로 돌아온거임")
     }
 
     //Loading Current ChatRoom list

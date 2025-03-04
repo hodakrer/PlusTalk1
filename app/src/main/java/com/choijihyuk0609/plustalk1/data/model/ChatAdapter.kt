@@ -1,6 +1,7 @@
 package com.choijihyuk0609.plustalk1.data.model
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -10,7 +11,7 @@ import com.choijihyuk0609.plustalk1.databinding.ItemChatBinding
 class ChatAdapter(
     private val datas: List<ChatRoom>,
     private val context: Context,
-    private val listener: OnRecyclerItemClickListener
+    private val listener: OnChatRecyclerItemClickListener
 ) : RecyclerView.Adapter<ChatAdapter.ChatViewHolder>() {
 
     inner class ChatViewHolder(private val binding: ItemChatBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -18,7 +19,14 @@ class ChatAdapter(
             binding.root.setOnClickListener {
                 val position = bindingAdapterPosition
                 if (position != RecyclerView.NO_POSITION) {
-                    listener.onRecyclerItemClick(datas[position].memberEmail ?: "") // 클릭된 채팅방의 이메일 전달
+                    Log.d("kkang", "챗 아이템 클릭 시 멤버 이메일: ${datas[position].memberEmail}")
+                    Log.d("kkang", "챗 아이템 클릭 시 프랜드 이메일: ${datas[position].friendEmail}")
+                    Log.d("kkang", "챗 아이템 클릭 시 챗방 아이디: ${datas[position].chatRoomId}")
+                    listener.onRecyclerItemClick(datas[position].memberEmail ?: "",
+                                                datas[position].friendEmail ?: "",
+                                                datas[position].chatRoomId ?: "")// 클릭된 채팅방의 이메일 전달
+                    Log.d("kkang", "여기 ChatAdapter임. listener.onRecyclerItemClick 하고 나왔다는데요?")
+
                 }
             }
         }
