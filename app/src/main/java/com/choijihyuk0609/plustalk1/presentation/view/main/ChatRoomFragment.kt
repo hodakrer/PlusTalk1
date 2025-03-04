@@ -2,6 +2,7 @@ package com.choijihyuk0609.plustalk1.presentation.view.main
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -24,7 +25,7 @@ import retrofit2.Response
 
 
 class ChatRoomFragment : Fragment() {
-
+    private var memberEmail: String? = null
     private lateinit var recyclerView: RecyclerView
     private lateinit var chatAdapter: ChatMessageAdapter
     private val messageList = mutableListOf<ChatMessage>()
@@ -79,40 +80,46 @@ class ChatRoomFragment : Fragment() {
     }
 
     private fun loadChatMessages() {
-        val memberEmail = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
-            .getString("email", null) ?: return
+        memberEmail = arguments?.getString("memberEmail")
+        // SharedPreferences에서 채팅방 ID 가져오기
+        val chatRoomId = requireContext()
+            .getSharedPreferences("CHATTINGROOMID", Context.MODE_PRIVATE)
+            .getString(memberEmail, null)
 
-        val chatRoomId = "your_chat_room_id_here" // 실제 채팅방 ID로 바꿔주세요
+        if (memberEmail != null && chatRoomId != null){
+            val chatMessageListAllRequest = ChatMessageListAllRequest(memberEmail!!, chatRoomId)
 
-        val chatMessageListAllRequest = ChatMessageListAllRequest(memberEmail, chatRoomId)
-
-        MainActivity.RetrofitInstance.apiService.listAllChatMessage(chatMessageListAllRequest)
-            .enqueue(object : Callback<ChatMessageListAllResponse> {
-                override fun onResponse(
-                    call: Call<ChatMessageListAllResponse>,
-                    response: Response<ChatMessageListAllResponse>
-                ) {
-                    if (response.isSuccessful) {
-                        val chatMessagesData = response.body()?.data
-                        if (chatMessagesData != null) {
-                            messageList.clear()
-                            messageList.addAll(chatMessagesData.map { data ->
-                                ChatMessage(
-                                    message = if (data.isImage == true) data.imageUrl else data.messageText, // 이미지 메시지 처리
-                                    isSentByUser = data.senderEmail == memberEmail // 유저 본인 여부 판별
-                                )
-                            })
-                            chatMessageAdapter.notifyDataSetChanged()
+            MainActivity.RetrofitInstance.apiService.listAllChatMessage(chatMessageListAllRequest)
+                .enqueue(object : Callback<ChatMessageListAllResponse> {
+                    override fun onResponse(
+                        call: Call<ChatMessageListAllResponse>,
+                        response: Response<ChatMessageListAllResponse>
+                    ) {
+                        if (response.isSuccessful) {
+                            val chatMessagesData = response.body()?.data
+                            if (chatMessagesData != null) {
+                                messageList.clear()
+                                messageList.addAll(chatMessagesData.map { data ->
+                                    ChatMessage(
+                                        message = if (data.isImage == true) data.imageUrl else data.messageText, // 이미지 메시지 처리
+                                        isSentByUser = data.senderEmail == memberEmail // 유저 본인 여부 판별
+                                    )
+                                })
+                                chatMessageAdapter.notifyDataSetChanged()
+                            }
+                        } else {
+                            Toast.makeText(context, "Failed to load messages", Toast.LENGTH_SHORT).show()
                         }
-                    } else {
-                        Toast.makeText(context, "Failed to load messages", Toast.LENGTH_SHORT).show()
                     }
-                }
 
-                override fun onFailure(call: Call<ChatMessageListAllResponse>, t: Throwable) {
-                    Toast.makeText(context, "Network error: ${t.localizedMessage}", Toast.LENGTH_SHORT).show()
-                }
-            })
+                    override fun onFailure(call: Call<ChatMessageListAllResponse>, t: Throwable) {
+                        Toast.makeText(context, "Network error: ${t.localizedMessage}", Toast.LENGTH_SHORT).show()
+                    }
+                })
+        } else {
+            Log.d("kkang", "memberEmail: ${memberEmail} \n chatRoomId: ${chatRoomId}")
+        }
+
     }
 
     private fun sendMessageToServer(messageText: String) {

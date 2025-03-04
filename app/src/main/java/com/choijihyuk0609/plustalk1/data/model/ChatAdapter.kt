@@ -8,7 +8,7 @@ import com.choijihyuk0609.plustalk1.databinding.ItemChatBinding
 
 
 class ChatAdapter(
-    private val datas: List<ChatRoomListData>,
+    private val datas: List<ChatRoom>,
     private val context: Context,
     private val listener: OnRecyclerItemClickListener
 ) : RecyclerView.Adapter<ChatAdapter.ChatViewHolder>() {
@@ -23,7 +23,7 @@ class ChatAdapter(
             }
         }
 
-        fun bind(chatRoom: ChatRoomListData) { // ChatRoom → ChatRoomListData
+        fun bind(chatRoom: ChatRoom) { // ChatRoom → ChatRoomListData
             binding.email.text = chatRoom.friendEmail ?: "" // friendEmail 표시
         }
     }

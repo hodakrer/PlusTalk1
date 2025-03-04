@@ -148,23 +148,6 @@ class FriendFragment : Fragment(), OnRecyclerItemClickListener {
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }*/
 
-    //Implementing SoftKeyboard
-    private fun showKeyboard(view: View) {
-        val inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
-        loadFriendList()
-    }
-
-    private fun hideKeyboard(view: View) {
-        val inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
-        Log.e("kkang", "KEYBOARD IS HIDDEN!!!!")
-        //regenerate original FriendList from SearchFriendList
-        loadFriendList()
-
-    }
-
-
     override fun onRecyclerItemClick(email: String) {
         // Handle the click event here
         Toast.makeText(requireContext(), "Clicked on email: $email", Toast.LENGTH_SHORT).show()
@@ -183,7 +166,7 @@ class FriendFragment : Fragment(), OnRecyclerItemClickListener {
                 override fun onResponse(call: Call<FriendListResponse>, response: Response<FriendListResponse>) {
                     if (response.isSuccessful) {
                         datas.clear()
-                        datas.addAll(response.body()?.friends ?: emptyList( ) ) // Add all friends to the datas list
+                        datas.addAll(response.body()?.data?: emptyList( ) ) // Add all friends to the datas list
                         binding.frFriendRecyclerView.layoutManager = LinearLayoutManager(requireContext())
                         binding.frFriendRecyclerView.adapter = FriendAdapter(datas, requireContext(), this@FriendFragment)
                         binding.frFriendRecyclerView.adapter?.notifyDataSetChanged() // Update the RecyclerView

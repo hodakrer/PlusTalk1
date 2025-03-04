@@ -13,22 +13,18 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.choijihyuk0609.plustalk1.R
 import com.choijihyuk0609.plustalk1.data.model.ChatAdapter
-import com.choijihyuk0609.plustalk1.data.model.ChatRoomListData
+import com.choijihyuk0609.plustalk1.data.model.ChatRoom
 import com.choijihyuk0609.plustalk1.data.model.ChatRoomListRequest
 import com.choijihyuk0609.plustalk1.data.model.ChatRoomListResponse
 import com.choijihyuk0609.plustalk1.data.model.OnRecyclerItemClickListener
 import com.choijihyuk0609.plustalk1.databinding.FragmentChatBinding
-
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-
 class ChatFragment : Fragment(), OnRecyclerItemClickListener {
-
-
     private lateinit var binding: FragmentChatBinding
-    private var datas: MutableList<ChatRoomListData> = mutableListOf( )
+    private var datas: MutableList<ChatRoom> = mutableListOf( )
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,19 +47,14 @@ class ChatFragment : Fragment(), OnRecyclerItemClickListener {
     }
 
     override fun onRecyclerItemClick(email: String) {
-        // Show a Toast message to confirm the item click
-        //Toast.makeText(requireContext(), "Clicked on email: $email", Toast.LENGTH_SHORT).show()
+        Log.d("kkang", "onRecyclerItemClick and Email: ${email}")
 
-        // Create a Bundle to pass the email data
         val bundle = Bundle()
-        bundle.putString("email", email)
+        bundle.putString("member", email)
 
         // Create an instance of ChatRoomFragment
         val chatRoomFragment = ChatRoomFragment()
         chatRoomFragment.arguments = bundle
-
-        //Communicate with server -> making chatroom
-        // Use FragmentTransaction to replace the current fragment with ChatRoomFragment
         parentFragmentManager.beginTransaction()
             .replace(R.id.container, chatRoomFragment)  // Replace with your container's ID
             .addToBackStack(null)  // Optionally add to back stack for navigating back
@@ -84,7 +75,7 @@ class ChatFragment : Fragment(), OnRecyclerItemClickListener {
 
                     if (response.isSuccessful) {
                         val chatRoomList = response.body()?.data ?: emptyList()
-
+                        Log.d("kkang", "chatRoomList: ${chatRoomList}")
                         datas.clear()
                         datas.addAll(chatRoomList) // ChatRoomListData 타입을 추가
 

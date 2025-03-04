@@ -1,19 +1,17 @@
 package com.choijihyuk0609.plustalk1.data.model
 
-data class ChatRoomAddResponse(
+data class ChatRoomCreateResponse(
     val status: Int,
     val message: String,
-    val data: ChatRoomData?
+    val data: ChatRoomCreateDatas?
 )
 
-data class ChatRoomData(
-    val memberEmail: String?,
-    val friendEmail: String?,
-    val chatRoomId:  String?,
-    val CreatedTime: String?
+data class ChatRoomCreateDatas(
+    val memberEmail: String,
+    val friendEmail: String,
+    val chatRoomId: String,
+    val createdTime: String
 )
-
-
 /*
 * //예시
 {

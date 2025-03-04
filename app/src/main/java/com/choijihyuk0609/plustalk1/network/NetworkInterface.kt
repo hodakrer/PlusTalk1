@@ -4,8 +4,8 @@ import com.choijihyuk0609.plustalk1.data.model.ChatMessageCreateRequest
 import com.choijihyuk0609.plustalk1.data.model.ChatMessageCreateResponse
 import com.choijihyuk0609.plustalk1.data.model.ChatMessageListAllRequest
 import com.choijihyuk0609.plustalk1.data.model.ChatMessageListAllResponse
-import com.choijihyuk0609.plustalk1.data.model.ChatRoomAddRequest
-import com.choijihyuk0609.plustalk1.data.model.ChatRoomAddResponse
+import com.choijihyuk0609.plustalk1.data.model.ChatRoomCreateRequest
+import com.choijihyuk0609.plustalk1.data.model.ChatRoomCreateResponse
 import com.choijihyuk0609.plustalk1.data.model.ChatRoomListRequest
 import com.choijihyuk0609.plustalk1.data.model.ChatRoomListResponse
 import com.choijihyuk0609.plustalk1.data.model.FriendAddRequest
@@ -51,8 +51,8 @@ interface NetworkInterface {
 
     @POST("chatroom/create")
     fun createChatRoom(
-        @Body chatRoomAddRequest: ChatRoomAddRequest
-    ): Call<ChatRoomAddResponse>
+        @Body chatRoomCreateRequest: ChatRoomCreateRequest
+    ): Call<ChatRoomCreateResponse>
 
     @POST("chatroom/list")
     fun listChatroom(
