@@ -12,6 +12,7 @@ import android.widget.Toast
 import com.choijihyuk0609.plustalk1.R
 import com.choijihyuk0609.plustalk1.data.model.SignupRequest
 import com.choijihyuk0609.plustalk1.data.model.SignupResponse
+import com.choijihyuk0609.plustalk1.data.repository.RetrofitInstance
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -50,7 +51,7 @@ class SignupFragment : Fragment() {
 
     fun performSignup(email: String, password: String) {
         val signupRequest = SignupRequest(email, password)
-        val retrofitCall = AuthActivity.RetrofitInstance.apiService.signup(signupRequest)
+        val retrofitCall = RetrofitInstance.apiService.signup(signupRequest)
 
         retrofitCall.enqueue(object : Callback<SignupResponse> {
             override fun onResponse(

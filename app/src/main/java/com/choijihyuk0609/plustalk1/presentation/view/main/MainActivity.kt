@@ -115,19 +115,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    //Implementing RetrofitInstance by singleton pattern
-    object RetrofitInstance {
-        private val retrofit: Retrofit by lazy {
-            Retrofit.Builder( )
-                .baseUrl("https://rapapa.site/")
-                .addConverterFactory(GsonConverterFactory.create( ) )
-                .build( )
-        }
-        val apiService: NetworkInterface by lazy {
-            retrofit.create(NetworkInterface::class.java)
-        }
-    }
-
     // Function to check if the user is logged in
     private fun isUserLoggedIn(): Boolean {
         // Use SharedPreferences to check if login info is saved

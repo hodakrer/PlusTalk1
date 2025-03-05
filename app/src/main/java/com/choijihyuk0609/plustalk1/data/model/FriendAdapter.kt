@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat.getString
 import androidx.recyclerview.widget.RecyclerView
 import com.choijihyuk0609.plustalk1.R
+import com.choijihyuk0609.plustalk1.data.repository.RetrofitInstance
 import com.choijihyuk0609.plustalk1.databinding.ItemFriendBinding
 
 import com.choijihyuk0609.plustalk1.network.NetworkInterface
@@ -144,16 +145,4 @@ class FriendAdapter(val datas: List<Friend>,
             }
         })
     }
-
-    object RetrofitInstance {
-        private val retrofit: Retrofit by lazy {
-            Retrofit.Builder( )
-                .baseUrl("https://rapapa.site/")
-                .addConverterFactory(GsonConverterFactory.create( ) )
-                .build( )
-        }
-        val apiService: NetworkInterface by lazy {
-            retrofit.create(NetworkInterface::class.java)
-        }
-    }
-    }
+}

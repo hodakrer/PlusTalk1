@@ -17,6 +17,7 @@ import com.choijihyuk0609.plustalk1.data.model.ChatRoom
 import com.choijihyuk0609.plustalk1.data.model.ChatRoomListRequest
 import com.choijihyuk0609.plustalk1.data.model.ChatRoomListResponse
 import com.choijihyuk0609.plustalk1.data.model.OnChatRecyclerItemClickListener
+import com.choijihyuk0609.plustalk1.data.repository.RetrofitInstance
 import com.choijihyuk0609.plustalk1.databinding.FragmentChatBinding
 import retrofit2.Call
 import retrofit2.Callback
@@ -78,7 +79,7 @@ class ChatFragment : Fragment(), OnChatRecyclerItemClickListener {
             .getString("email", null)
         val chatRoomRequest = ChatRoomListRequest(memberEmail = email)
 
-        MainActivity.RetrofitInstance.apiService.listChatroom(chatRoomRequest)
+        RetrofitInstance.apiService.listChatroom(chatRoomRequest)
             .enqueue(object : Callback<ChatRoomListResponse> {
                 override fun onResponse(call: Call<ChatRoomListResponse>, response: Response<ChatRoomListResponse>) {
 

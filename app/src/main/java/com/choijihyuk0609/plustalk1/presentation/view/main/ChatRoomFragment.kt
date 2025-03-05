@@ -21,6 +21,7 @@ import com.choijihyuk0609.plustalk1.data.model.ChatMessageCreateRequest
 import com.choijihyuk0609.plustalk1.data.model.ChatMessageCreateResponse
 import com.choijihyuk0609.plustalk1.data.model.ChatMessageListAllRequest
 import com.choijihyuk0609.plustalk1.data.model.ChatMessageListAllResponse
+import com.choijihyuk0609.plustalk1.data.repository.RetrofitInstance
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -142,7 +143,7 @@ class ChatRoomFragment : Fragment() {
         if (memberEmail != null && chatRoomId != null){
             val chatMessageListAllRequest = ChatMessageListAllRequest(memberEmail, chatRoomId)
 
-            MainActivity.RetrofitInstance.apiService.listAllChatMessage(chatMessageListAllRequest)
+            RetrofitInstance.apiService.listAllChatMessage(chatMessageListAllRequest)
                 .enqueue(object : Callback<ChatMessageListAllResponse> {
                     override fun onResponse(
                         call: Call<ChatMessageListAllResponse>,
@@ -184,7 +185,7 @@ class ChatRoomFragment : Fragment() {
             messageText = messageText
         )
 
-        MainActivity.RetrofitInstance.apiService.createChatMessage(request)
+        RetrofitInstance.apiService.createChatMessage(request)
             .enqueue(object : Callback<ChatMessageCreateResponse> {
                 override fun onResponse(
                     call: Call<ChatMessageCreateResponse>,

@@ -117,4 +117,8 @@ dependencies {
 
     // LiveData
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
+
+    // Espresso 라이브러리 의존성
+    implementation("androidx.test.espresso:espresso-core:3.6.1")
+    implementation("androidx.test.ext:junit:1.2.1")
 }

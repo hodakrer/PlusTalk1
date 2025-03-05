@@ -6,20 +6,17 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.View
-import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import com.choijihyuk0609.plustalk1.R
+import com.choijihyuk0609.plustalk1.data.repository.RetrofitInstance
 import com.choijihyuk0609.plustalk1.data.model.SigninRequest
 import com.choijihyuk0609.plustalk1.data.model.SigninResponse
 import com.choijihyuk0609.plustalk1.presentation.view.main.MainActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-
-
-import retrofit2.converter.gson.GsonConverterFactory
 
 class SigninFragment : Fragment(R.layout.fragment_signin) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -62,7 +59,7 @@ class SigninFragment : Fragment(R.layout.fragment_signin) {
             "I CAME INTO performSignin function"
         )
         val signinRequest = SigninRequest(email, password)
-        val retrofitCall  = AuthActivity.RetrofitInstance.apiService.signin(signinRequest)
+        val retrofitCall  = RetrofitInstance.apiService.signin(signinRequest)
         Log.d(
             "Signin",
             "Before enqueuing retrofit"

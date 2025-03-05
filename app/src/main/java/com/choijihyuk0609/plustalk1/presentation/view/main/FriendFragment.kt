@@ -29,6 +29,7 @@ import com.choijihyuk0609.plustalk1.data.model.FriendListResponse
 import com.choijihyuk0609.plustalk1.data.model.FriendSearchRequest
 import com.choijihyuk0609.plustalk1.data.model.FriendSearchResponse
 import com.choijihyuk0609.plustalk1.data.model.OnRecyclerItemClickListener
+import com.choijihyuk0609.plustalk1.data.repository.RetrofitInstance
 import com.choijihyuk0609.plustalk1.databinding.FragmentFriendBinding
 
 import retrofit2.Call
@@ -161,7 +162,7 @@ class FriendFragment : Fragment(), OnRecyclerItemClickListener {
         val email = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
             .getString("email", null)
 
-        MainActivity.RetrofitInstance.apiService.listFriend(FriendListRequest(email.toString()))
+        RetrofitInstance.apiService.listFriend(FriendListRequest(email.toString()))
             .enqueue(object : Callback<FriendListResponse> {
                 override fun onResponse(call: Call<FriendListResponse>, response: Response<FriendListResponse>) {
                     if (response.isSuccessful) {
@@ -186,7 +187,7 @@ class FriendFragment : Fragment(), OnRecyclerItemClickListener {
 
     private fun searchFriend(query: String) {
         val request = FriendSearchRequest(memberEmail = query)
-        MainActivity.RetrofitInstance.apiService.searchFriend(request).enqueue(object :
+        RetrofitInstance.apiService.searchFriend(request).enqueue(object :
             Callback<FriendSearchResponse> {
             override fun onResponse(
                 call: Call<FriendSearchResponse>,
