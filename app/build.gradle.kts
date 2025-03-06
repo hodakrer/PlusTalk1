@@ -8,7 +8,6 @@ android {
     namespace = "com.choijihyuk0609.plustalk1"
     compileSdk = 35
 
-
     defaultConfig {
         applicationId = "com.choijihyuk0609.plustalk1"
         minSdk = 26
@@ -21,7 +20,6 @@ android {
             useSupportLibrary = true
         }
     }
-
 
     signingConfigs {
         create("release") {
@@ -116,6 +114,7 @@ dependencies {
     kapt("androidx.room:room-compiler:2.6.1") // Use 'kapt' for Kotlin annotation processing
 
     // LiveData
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
 
     // Espresso 라이브러리 의존성

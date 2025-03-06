@@ -3,45 +3,32 @@ package com.choijihyuk0609.plustalk1.presentation.view.auth
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
+
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.lifecycle.Observer
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.choijihyuk0609.plustalk1.R
-import com.choijihyuk0609.plustalk1.data.repository.RetrofitInstance
-import com.choijihyuk0609.plustalk1.data.model.SigninRequest
-import com.choijihyuk0609.plustalk1.data.model.SigninResponse
 import com.choijihyuk0609.plustalk1.presentation.view.main.MainActivity
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.choijihyuk0609.plustalk1.presentation.viewmodel.SigninViewModel
 
 class SigninFragment : Fragment(R.layout.fragment_signin) {
+    private lateinit var viewModel: SigninViewModel
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        viewModel = ViewModelProvider(this).get(SigninViewModel::class.java)
         //Values View-Binded from Xml
         val emailInput = view.findViewById<EditText>(R.id.frSignin_emailInput)
         val passwordInput = view.findViewById<EditText>(R.id.frSignin_passwordInput)
         val signinButton = view.findViewById<Button>(R.id.frSignin_SigninButton)
         val signupButton = view.findViewById<Button>(R.id.frSignin_SignupButton)
 
-        //Handling Button signin -> Call 'performSignin' Function
         signinButton.setOnClickListener {
-            val email = emailInput.text.toString()
-            val password = passwordInput.text.toString()
-
-            if(email.isNotEmpty() && password.isNotEmpty()) {
-                Log.d(
-                    "Signin",
-                    "I CLICKED"
-                )
-                performSignin(email, password)
-            } else {
-                Toast.makeText(requireContext(), "Please fill in the blanks", Toast.LENGTH_SHORT).show( )
-            }
+            viewModel.signin(emailInput.text.toString( ), passwordInput.text.toString() )
         }
         //Handling Button signup -> Move to SignupFragment
         signupButton.setOnClickListener {
@@ -50,61 +37,19 @@ class SigninFragment : Fragment(R.layout.fragment_signin) {
                 .addToBackStack(null)
                 .commit()
         }
-    }
 
-    //Function Signin + NTW
-    private fun performSignin(email: String, password: String) {
-        Log.d(
-            "Signin",
-            "I CAME INTO performSignin function"
-        )
-        val signinRequest = SigninRequest(email, password)
-        val retrofitCall  = RetrofitInstance.apiService.signin(signinRequest)
-        Log.d(
-            "Signin",
-            "Before enqueuing retrofit"
-        )
-        retrofitCall.enqueue(object: Callback<SigninResponse> {
-            override fun onResponse(
-                call: Call<SigninResponse>,
-                response: Response<SigninResponse>
-            ) {
-                if (response.isSuccessful) {
-                    val signinResponse = response.body()
-                    // Log the entire response to see what it contains
-
-                    if (signinResponse != null) {
-                        // Access the fields
-                        Toast.makeText(requireContext(), "Signin Successful", Toast.LENGTH_SHORT).show()
-                        val status    = signinResponse.status
-                        val message   = signinResponse.message
-                        val datas     = signinResponse.datas
-
-                        // Save Signin Info
-                        saveUserInfo(email)
-
-                        // Move to MainActivity
-                        val intent = Intent(requireContext(), MainActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        startActivity(intent)
-
-                    }
-                } else {
-                    if (response.code() == 401){
-                        Toast.makeText(requireContext(), "We can't find your id registered.", Toast.LENGTH_SHORT).show()
-                    } else {
-                        // Handle the error response
-                        Toast.makeText(requireContext(), "Signin failed: ${response.message()}", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-            override fun onFailure(call: Call<SigninResponse>, t: Throwable) {
-                // Handle network failure
-                Toast.makeText(requireContext(), "Network error: ${t.message}", Toast.LENGTH_SHORT).show()
+        // 로그인 결과 옵저빙
+        viewModel.loginResult.observe(viewLifecycleOwner, Observer { success ->
+            if (success) {
+                val email = emailInput.text.toString()
+                saveUserInfo(email)  // 로그인 성공 시 이메일 저장
+                // 로그인 성공 후 이동 (예: MainActivity로 이동)
+                startActivity(Intent(requireContext(), MainActivity::class.java))
+            } else {
+                // 로그인 실패 시 처리 (Toast 또는 에러 메시지)
+                Toast.makeText(requireContext(), "로그인 실패", Toast.LENGTH_SHORT).show()
             }
         })
-
-
     }
 
     private fun saveUserInfo(email: String) {
