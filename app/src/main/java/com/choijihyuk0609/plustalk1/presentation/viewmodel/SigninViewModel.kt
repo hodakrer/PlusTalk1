@@ -11,6 +11,7 @@ import retrofit2.Response
 
 class SigninViewModel : ViewModel( ) {
     val loginResult = MutableLiveData<Boolean>( )
+    val signupButton = MutableLiveData<Boolean>( )
     val errorMessage = MutableLiveData<String>( )
     val navigateToNextScreen = MutableLiveData<Boolean>( )
 
@@ -51,5 +52,9 @@ class SigninViewModel : ViewModel( ) {
         } else {
             errorMessage.value = "아이디와 비밀번호를 채워주세요."
         }
+    }
+
+    fun clickSignupButton(){
+        signupButton.value = true
     }
 }

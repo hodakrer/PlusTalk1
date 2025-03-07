@@ -20,7 +20,7 @@ class SigninFragment : Fragment(R.layout.fragment_signin) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this).get(SigninViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(SigninViewModel :: class.java)
         //Values View-Binded from Xml
         val emailInput = view.findViewById<EditText>(R.id.frSignin_emailInput)
         val passwordInput = view.findViewById<EditText>(R.id.frSignin_passwordInput)
@@ -30,6 +30,7 @@ class SigninFragment : Fragment(R.layout.fragment_signin) {
         signinButton.setOnClickListener {
             viewModel.signin(emailInput.text.toString( ), passwordInput.text.toString() )
         }
+
         //Handling Button signup -> Move to SignupFragment
         signupButton.setOnClickListener {
             parentFragmentManager.beginTransaction()
