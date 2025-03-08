@@ -17,11 +17,11 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import android.Manifest
 import android.os.Build
+import com.choijihyuk0609.plustalk1.utils.PermissionRequest
 
 class MainActivity : AppCompatActivity() {
-    // Request code for runtime permissions
-    private val REQUEST_CODE_PERMISSIONS = 1001
-
+    //PermissionRequest code on utils package
+    private lateinit var permissionRequest: PermissionRequest
     //Variables
     private val friendFragment = FriendFragment()
     private val chatFragment = ChatFragment()
@@ -34,7 +34,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // Check and request permissions at the start
-        checkAndRequestPermissions()
+        permissionRequest = PermissionRequest(this)
+        permissionRequest.checkAndRequestPermissions()
 
         // Check if user is logged in
         if (!isUserLoggedIn()) {
@@ -71,50 +72,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun checkAndRequestPermissions() {
-        val permissions = mutableListOf(
-            Manifest.permission.READ_CONTACTS
-        )
-
-        // Add permissions conditionally based on SDK version
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permissions.add(Manifest.permission.READ_MEDIA_IMAGES)
-        } else {
-            permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
-            permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        }
-
-        val permissionsToRequest = permissions.filter {
-            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
-        }
-
-        if (permissionsToRequest.isNotEmpty()) {
-            ActivityCompat.requestPermissions(
-                this,
-                permissionsToRequest.toTypedArray(),
-                REQUEST_CODE_PERMISSIONS
-            )
-        }
-    }
-
-    // Handle permission request result
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        if (requestCode == REQUEST_CODE_PERMISSIONS) {
-            if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
-                // Permissions granted, proceed with app functionality
-            } else {
-                // Handle permission denial (e.g., show a message to the user)
-                Toast.makeText(this, "Permissions denied", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
     // Function to check if the user is logged in
     private fun isUserLoggedIn(): Boolean {
         // Use SharedPreferences to check if login info is saved
@@ -137,14 +94,4 @@ class MainActivity : AppCompatActivity() {
             .replace(R.id.container, fragment)
             .commit()
     }
-
-
-    fun navigateToFriendFragment() {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.container, FriendFragment())
-            .addToBackStack(null)
-            .commit()
-    }
-
-
 }

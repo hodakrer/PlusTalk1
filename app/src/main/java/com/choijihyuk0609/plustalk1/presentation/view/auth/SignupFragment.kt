@@ -40,7 +40,7 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
         viewModel.signupResult.observe(viewLifecycleOwner, Observer { success ->
             if (success) {
                 parentFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container, SignupFragment())
+                    .replace(R.id.fragment_container, SigninFragment())
                     .addToBackStack(null)
                     .commit()
             }
