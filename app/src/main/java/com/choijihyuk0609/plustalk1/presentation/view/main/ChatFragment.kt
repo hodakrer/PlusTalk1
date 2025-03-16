@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.choijihyuk0609.plustalk1.R
 import com.choijihyuk0609.plustalk1.data.model.ChatAdapter
 import com.choijihyuk0609.plustalk1.data.model.ChatRoom
@@ -25,7 +26,10 @@ import retrofit2.Response
 
 class ChatFragment : Fragment(), OnChatRecyclerItemClickListener {
     private lateinit var binding: FragmentChatBinding
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: ChatAdapter
     private var datas: MutableList<ChatRoom> = mutableListOf( )
+    //datas 수치 -> 1만개로!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,9 +38,21 @@ class ChatFragment : Fragment(), OnChatRecyclerItemClickListener {
         binding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_chat, container, false
         )
+        recyclerView = binding.frChatRecyclerView
+        recyclerView.setHasFixedSize(true) // RecyclerView 크기 고정 (성능 최적화)
 
+        // MainActivity에서 전달된 RecycledViewPool을 사용
+        val pool = (activity as MainActivity).recycledViewPool
+        recyclerView.setRecycledViewPool(pool)
+
+        
+        //어뎁터 초기화
+        adapter = ChatAdapter(datas, requireContext(), this@ChatFragment)
+        recyclerView.adapter = adapter
+        
+        //어뎁터값을 레이아웃매니저로 넘김
         binding.frChatRecyclerView.layoutManager = LinearLayoutManager(requireContext( ) )
-        binding.frChatRecyclerView.adapter = ChatAdapter(datas, requireContext(), this@ChatFragment)
+
         binding.frChatRecyclerView.addItemDecoration(
             DividerItemDecoration(requireContext( ),
                 LinearLayoutManager.VERTICAL)
@@ -44,6 +60,8 @@ class ChatFragment : Fragment(), OnChatRecyclerItemClickListener {
         loadChatRoomList()
         return binding.root
     }
+
+
 
     override fun onRecyclerItemClick(email: String, friend: String, chatRoomId: String) {
         Log.d("kkang", "onRecyclerItemClick and Email: ${email}")
@@ -84,14 +102,20 @@ class ChatFragment : Fragment(), OnChatRecyclerItemClickListener {
                 override fun onResponse(call: Call<ChatRoomListResponse>, response: Response<ChatRoomListResponse>) {
 
                     if (response.isSuccessful) {
-                        val chatRoomList = response.body()?.data ?: emptyList()
-                        Log.d("kkang", "chatRoomList: ${chatRoomList}")
+                        //val chatRoomList = response.body()?.data ?: emptyList()
+                        val chatRoomList = MutableList(10000) { index ->
+                            ChatRoom(memberEmail = "$index", friendEmail = "$index", chatRoomId = "$index", createdTime = "")
+                        }
+
+                        Log.d("kkang", "chatRoomList: $chatRoomList")
+
                         datas.clear()
-                        datas.addAll(chatRoomList) // ChatRoomListData 타입을 추가
+                        datas.addAll(chatRoomList)
 
                         binding.frChatRecyclerView.layoutManager = LinearLayoutManager(requireContext())
                         binding.frChatRecyclerView.adapter = ChatAdapter(datas, requireContext(), this@ChatFragment)
-                        binding.frChatRecyclerView.adapter?.notifyDataSetChanged()
+
+                        binding.frChatRecyclerView.adapter?.notifyItemRangeInserted(0, chatRoomList.size)
                     } else {
                         Log.e("ChatRoomList", "Response error: ${response.code()}")
                         Toast.makeText(requireContext(), "Failed to load chat rooms.", Toast.LENGTH_SHORT).show()
@@ -104,4 +128,6 @@ class ChatFragment : Fragment(), OnChatRecyclerItemClickListener {
                 }
             })
     }
+
+
 }

@@ -17,6 +17,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import android.Manifest
 import android.os.Build
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.RecycledViewPool
 import com.choijihyuk0609.plustalk1.utils.PermissionRequest
 
 class MainActivity : AppCompatActivity() {
@@ -28,10 +30,17 @@ class MainActivity : AppCompatActivity() {
     private val imageFragment = ImageFragment()
     private val settingFragment = SettingFragment()
 
+    //Fragment의 리사이클드뷰풀 공유
+    val recycledViewPool = RecyclerView.RecycledViewPool()
+
+
     //Lifecycle onCreate
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        //FriendFragment와 ChatFragment에 recycledViewPool 공유하도록
+        val friendFragment = FriendFragment()
+        val chatFragment = ChatFragment()
 
         // Check and request permissions at the start
         permissionRequest = PermissionRequest(this)

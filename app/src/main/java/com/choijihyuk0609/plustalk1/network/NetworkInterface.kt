@@ -44,10 +44,11 @@ interface NetworkInterface {
         @Body friendAddReqeust: FriendAddRequest
     ): Call<FriendAddResponse>
 
+
     @POST("friend/list")
-    fun listFriend(
+    suspend fun listFriend(
         @Body friendListRequest: FriendListRequest
-    ): Call<FriendListResponse>
+    ): FriendListResponse
 
     @POST("chatroom/create")
     fun createChatRoom(
