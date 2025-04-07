@@ -8,7 +8,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.compose.runtime.snapshots.Snapshot.Companion.observe
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,6 +23,8 @@ import com.choijihyuk0609.plustalk1.data.model.ChatRoomListResponse
 import com.choijihyuk0609.plustalk1.data.model.OnChatRecyclerItemClickListener
 import com.choijihyuk0609.plustalk1.data.repository.RetrofitInstance
 import com.choijihyuk0609.plustalk1.databinding.FragmentChatBinding
+import com.choijihyuk0609.plustalk1.presentation.viewmodel.ChatFragmentViewModel
+import com.choijihyuk0609.plustalk1.presentation.viewmodel.FriendViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -31,6 +36,8 @@ class ChatFragment : Fragment(), OnChatRecyclerItemClickListener {
     private var datas: MutableList<ChatRoom> = mutableListOf( )
     //datas 수치 -> 1만개로!
 
+    private lateinit var viewModel: ChatFragmentViewModel
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -38,12 +45,22 @@ class ChatFragment : Fragment(), OnChatRecyclerItemClickListener {
         binding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_chat, container, false
         )
+
+        viewModel = ViewModelProvider(this).get(ChatFragmentViewModel::class.java)
         recyclerView = binding.frChatRecyclerView
         recyclerView.setHasFixedSize(true) // RecyclerView 크기 고정 (성능 최적화)
 
         // MainActivity에서 전달된 RecycledViewPool을 사용
         val pool = (activity as MainActivity).recycledViewPool
         recyclerView.setRecycledViewPool(pool)
+
+        // ViewModel의 LiveData를 관찰
+        viewModel.chatRoom.observe(viewLifecycleOwner, Observer { chatRoom ->
+            if (chatRoom.isNotEmpty()) {
+                // RecyclerView 갱신
+                adapter.submitList(chatRoom) // ListAdapter의 submitList()로 리스트 갱신
+            }
+        })
 
         
         //어뎁터 초기화
@@ -57,6 +74,10 @@ class ChatFragment : Fragment(), OnChatRecyclerItemClickListener {
             DividerItemDecoration(requireContext( ),
                 LinearLayoutManager.VERTICAL)
         )
+        val email = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+            .getString("email", null)
+
+
         loadChatRoomList()
         return binding.root
     }
@@ -90,6 +111,7 @@ class ChatFragment : Fragment(), OnChatRecyclerItemClickListener {
     }
 
     //Loading Current ChatRoom list
+    /*
     private fun loadChatRoomList() {
         Log.e("kkang","Function loadFriendList called!")
         // Get stored email from SharedPreferences
@@ -102,10 +124,10 @@ class ChatFragment : Fragment(), OnChatRecyclerItemClickListener {
                 override fun onResponse(call: Call<ChatRoomListResponse>, response: Response<ChatRoomListResponse>) {
 
                     if (response.isSuccessful) {
-                        //val chatRoomList = response.body()?.data ?: emptyList()
-                        val chatRoomList = MutableList(10000) { index ->
-                            ChatRoom(memberEmail = "$index", friendEmail = "$index", chatRoomId = "$index", createdTime = "")
-                        }
+                        val chatRoomList = response.body()?.data ?: emptyList()
+                        //val chatRoomList = MutableList(10000) { index ->
+                        //    ChatRoom(memberEmail = "$index", friendEmail = "$index", chatRoomId = "$index", createdTime = "")
+                        //}
 
                         Log.d("kkang", "chatRoomList: $chatRoomList")
 
@@ -127,7 +149,7 @@ class ChatFragment : Fragment(), OnChatRecyclerItemClickListener {
                     Toast.makeText(requireContext(), "Network error: ${t.localizedMessage}", Toast.LENGTH_SHORT).show()
                 }
             })
-    }
+    }*/
 
 
 }

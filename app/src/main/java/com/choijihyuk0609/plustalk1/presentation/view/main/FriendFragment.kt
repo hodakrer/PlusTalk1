@@ -1,45 +1,28 @@
 package com.choijihyuk0609.plustalk1.presentation.view.main
 
-
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import android.widget.SearchView
 import android.widget.Toast
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.choijihyuk0609.plustalk1.R
-import com.choijihyuk0609.plustalk1.data.model.ChatRoom
 import com.choijihyuk0609.plustalk1.data.model.Friend
 import com.choijihyuk0609.plustalk1.data.model.FriendAdapter
-import com.choijihyuk0609.plustalk1.data.model.FriendListRequest
-import com.choijihyuk0609.plustalk1.data.model.FriendListResponse
-import com.choijihyuk0609.plustalk1.data.model.FriendSearchRequest
-import com.choijihyuk0609.plustalk1.data.model.FriendSearchResponse
 import com.choijihyuk0609.plustalk1.data.model.OnRecyclerItemClickListener
-import com.choijihyuk0609.plustalk1.data.repository.RetrofitInstance
 import com.choijihyuk0609.plustalk1.databinding.FragmentFriendBinding
 import com.choijihyuk0609.plustalk1.presentation.viewmodel.FriendViewModel
-
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class FriendFragment : Fragment(), OnRecyclerItemClickListener {
     //implementing variables
@@ -47,7 +30,7 @@ class FriendFragment : Fragment(), OnRecyclerItemClickListener {
     private lateinit var viewModel: FriendViewModel
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: FriendAdapter
-    private val datas = MutableList(10000) {index -> Friend(email = "$index", name = "", profileImageUrl = "") }
+    //private val datas = MutableList(10000) {index -> Friend(email = "$index", name = "", profileImageUrl = "") }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -62,7 +45,7 @@ class FriendFragment : Fragment(), OnRecyclerItemClickListener {
         viewModel = ViewModelProvider(this).get(FriendViewModel::class.java)
 
         // Adapter 설정
-        adapter = FriendAdapter(datas, requireContext(), this)
+        adapter = FriendAdapter(emptyList( ), requireContext( ), this)
         binding.frFriendRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.frFriendRecyclerView.adapter = adapter
 
