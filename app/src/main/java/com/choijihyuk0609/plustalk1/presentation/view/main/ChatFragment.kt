@@ -7,8 +7,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.compose.runtime.snapshots.Snapshot.Companion.observe
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -18,25 +16,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.choijihyuk0609.plustalk1.R
 import com.choijihyuk0609.plustalk1.data.model.ChatAdapter
 import com.choijihyuk0609.plustalk1.data.model.ChatRoom
-import com.choijihyuk0609.plustalk1.data.model.ChatRoomListRequest
-import com.choijihyuk0609.plustalk1.data.model.ChatRoomListResponse
 import com.choijihyuk0609.plustalk1.data.model.OnChatRecyclerItemClickListener
-import com.choijihyuk0609.plustalk1.data.repository.RetrofitInstance
 import com.choijihyuk0609.plustalk1.databinding.FragmentChatBinding
-import com.choijihyuk0609.plustalk1.presentation.viewmodel.ChatFragmentViewModel
-import com.choijihyuk0609.plustalk1.presentation.viewmodel.FriendViewModel
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.choijihyuk0609.plustalk1.presentation.viewmodel.ChatViewModel
 
 class ChatFragment : Fragment(), OnChatRecyclerItemClickListener {
     private lateinit var binding: FragmentChatBinding
+    private lateinit var viewModel: ChatViewModel
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ChatAdapter
     private var datas: MutableList<ChatRoom> = mutableListOf( )
     //datas 수치 -> 1만개로!
 
-    private lateinit var viewModel: ChatFragmentViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,7 +37,7 @@ class ChatFragment : Fragment(), OnChatRecyclerItemClickListener {
             inflater, R.layout.fragment_chat, container, false
         )
 
-        viewModel = ViewModelProvider(this).get(ChatFragmentViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(ChatViewModel::class.java)
         recyclerView = binding.frChatRecyclerView
         recyclerView.setHasFixedSize(true) // RecyclerView 크기 고정 (성능 최적화)
 

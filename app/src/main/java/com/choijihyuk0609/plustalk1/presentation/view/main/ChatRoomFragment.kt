@@ -11,20 +11,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
-import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.choijihyuk0609.plustalk1.R
 import com.choijihyuk0609.plustalk1.data.model.ChatMessage
 import com.choijihyuk0609.plustalk1.data.model.ChatMessageAdapter
 import com.choijihyuk0609.plustalk1.data.model.ChatMessageCreateRequest
-import com.choijihyuk0609.plustalk1.data.model.ChatMessageCreateResponse
-import com.choijihyuk0609.plustalk1.data.model.ChatMessageListAllRequest
-import com.choijihyuk0609.plustalk1.data.model.ChatMessageListAllResponse
-import com.choijihyuk0609.plustalk1.data.repository.RetrofitInstance
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.choijihyuk0609.plustalk1.presentation.viewmodel.ChatRoomViewModel
 
 
 class ChatRoomFragment : Fragment() {
@@ -33,10 +27,10 @@ class ChatRoomFragment : Fragment() {
     private lateinit var chatMessageAdapter: ChatMessageAdapter
     private val messageList = mutableListOf<ChatMessage>()
     private lateinit var editTextChat: EditText
-
     private var memberEmail: String? = null
     private var memberFriendEmail: String? = null
     private var chatRoomId: String? = null
+    private lateinit var viewModel: ChatRoomViewModel
 
 
     companion object {
@@ -53,7 +47,8 @@ class ChatRoomFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // ✅ arguments에서 값 가져오기 (올바른 방식)
+
+        // arguments에서 값 가져오기 (올바른 방식)
         arguments?.let {
             memberEmail = it.getString("member")
             memberFriendEmail = it.getString("friend")
@@ -67,10 +62,14 @@ class ChatRoomFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_chat_room, container, false)
 
+        // ViewModel을 Fragment에서 가져옴
+        viewModel = ViewModelProvider(this).get(ChatRoomViewModel :: class.java)
+
+        //UI 뷰바인딩
         recyclerView = view.findViewById(R.id.recyclerViewChat)
         editTextChat = view.findViewById(R.id.editTextChat)
 
-        // Null 체크 후 RecyclerView 초기화
+        //어뎁터, 리사이클러뷰 설정
         memberEmail?.let { email ->
             chatMessageAdapter = ChatMessageAdapter(messageList, email)
             recyclerView.adapter = chatMessageAdapter
@@ -78,23 +77,43 @@ class ChatRoomFragment : Fragment() {
         } ?: run {
             Log.e("ChatRoomFragment", "memberEmail is null")
         }
+        //뷰모델을 라이브데이터로 관찰
+
         // 채팅 메시지 로드
-        loadChatMessages(memberEmail!!, memberFriendEmail!!, chatRoomId!!)
+        //loadChatMessages(memberEmail!!, memberFriendEmail!!, chatRoomId!!)
 
         return view
     }
 
-
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        editTextChat = view.findViewById(R.id.editTextChat) // EditText 연결
+        // EditText 연결
+        editTextChat = view.findViewById(R.id.editTextChat)
 
         // RecyclerView 설정
         val recyclerView: RecyclerView = view.findViewById(R.id.recyclerViewChat)
-        chatMessageAdapter = ChatMessageAdapter(messageList, memberEmail!!)
+
+        // 어댑터 초기화 (초기엔 빈 리스트로 시작)
+        chatMessageAdapter = ChatMessageAdapter(mutableListOf(), memberEmail!!)
         recyclerView.adapter = chatMessageAdapter
+
+        // ViewModel 초기화 (ViewModelProvider를 사용해서 가져오세요)
+        val viewModel = ViewModelProvider(this)[ChatRoomViewModel::class.java]
+
+        // LiveData observe: 메시지 변화 감지 → 어댑터 업데이트
+        viewModel.chatMessages.observe(viewLifecycleOwner) { newMessages ->
+            // 어댑터 안에 messageList를 직접 바꾸는 방식이라면:
+            messageList.clear()
+            messageList.addAll(newMessages)
+            chatMessageAdapter.notifyDataSetChanged()
+
+            // 또는 만약 submitList 지원 어댑터라면:
+            // chatMessageAdapter.submitList(newMessages)
+        }
+
+        // 메시지 로드 호출
+        viewModel.loadChatMessages(memberEmail!!, chatRoomId!!)
 
         // 엔터키 눌렀을 때 메시지 처리
         editTextChat.setOnEditorActionListener { v, actionId, event ->
@@ -109,7 +128,7 @@ class ChatRoomFragment : Fragment() {
                     Log.d("kkang", "chatRoomId: ${chatRoomId}")
 
                     sendMessageToServer(messageText)
-                    loadChatMessages(memberEmail!!, memberFriendEmail!!, chatRoomId!!)
+                    viewModel.loadChatMessages(memberEmail!!, chatRoomId!!)
                     editTextChat.text.clear() // 입력 필드 초기화
                 }
                 true
@@ -122,14 +141,14 @@ class ChatRoomFragment : Fragment() {
     private val handler = Handler(Looper.getMainLooper())
     private val refreshRunnable = object : Runnable {
         override fun run() {
-            loadChatMessages(memberEmail!!, memberFriendEmail!!, chatRoomId!!)
+            viewModel.loadChatMessages(memberEmail!!, chatRoomId!!)
             handler.postDelayed(this, 1000) // 1초마다 실행
         }
     }
 
     override fun onResume() {
         super.onResume()
-        loadChatMessages(memberEmail!!, memberFriendEmail!!, chatRoomId!!) // 화면에 나타나면 바로 실행
+        viewModel.loadChatMessages(memberEmail!!, chatRoomId!!) // 화면에 나타나면 바로 실행
         handler.post(refreshRunnable) // 주기적 실행 시작
     }
 
@@ -138,6 +157,21 @@ class ChatRoomFragment : Fragment() {
         handler.removeCallbacks(refreshRunnable) // 화면에서 사라지면 중단
     }
 
+    private fun sendMessageToServer(messageText: String) {
+
+        val sharedPref = requireContext().getSharedPreferences(requireContext().getString(R.string.CHATTINGROOM), Context.MODE_PRIVATE)
+        val chatRoomId = sharedPref.getString(memberEmail, "none")
+
+        val request = ChatMessageCreateRequest(
+            senderEmail = memberEmail!!,
+            chatRoomId = chatRoomId!!,
+            messageId = (System.currentTimeMillis() % Int.MAX_VALUE).toInt(), // 임시 ID
+            isImage = false,
+            messageText = messageText
+        )
+    }
+
+    /*
     private fun loadChatMessages(memberEmail : String, memberFriendEmail : String, chatRoomId: String) {
 
         if (memberEmail != null && chatRoomId != null){
@@ -170,37 +204,6 @@ class ChatRoomFragment : Fragment() {
             Log.d("kkang", "memberEmail: ${memberEmail} \n chatRoomId: ${chatRoomId}")
         }
 
-    }
+    }*/
 
-    private fun sendMessageToServer(messageText: String) {
-
-        val sharedPref = requireContext().getSharedPreferences(requireContext().getString(R.string.CHATTINGROOM), Context.MODE_PRIVATE)
-        val chatRoomId = sharedPref.getString(memberEmail, "none")
-
-        val request = ChatMessageCreateRequest(
-            senderEmail = memberEmail!!,
-            chatRoomId = chatRoomId!!,
-            messageId = (System.currentTimeMillis() % Int.MAX_VALUE).toInt(), // 임시 ID
-            isImage = false,
-            messageText = messageText
-        )
-
-        RetrofitInstance.apiService.createChatMessage(request)
-            .enqueue(object : Callback<ChatMessageCreateResponse> {
-                override fun onResponse(
-                    call: Call<ChatMessageCreateResponse>,
-                    response: Response<ChatMessageCreateResponse>
-                ) {
-                    if (response.isSuccessful && response.body()?.status == 200) {
-                        loadChatMessages(memberEmail!!, memberFriendEmail!!, chatRoomId) // 서버에서 메시지 목록 다시 불러오기
-                    } else {
-                        Toast.makeText(context, "메시지 전송 실패", Toast.LENGTH_SHORT).show()
-                    }
-                }
-
-                override fun onFailure(call: Call<ChatMessageCreateResponse>, t: Throwable) {
-                    Toast.makeText(context, "네트워크 오류: ${t.localizedMessage}", Toast.LENGTH_SHORT).show()
-                }
-            })
-    }
 }
