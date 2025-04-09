@@ -25,9 +25,6 @@ class ChatFragment : Fragment(), OnChatRecyclerItemClickListener {
     private lateinit var viewModel: ChatViewModel
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ChatAdapter
-    private var datas: MutableList<ChatRoom> = mutableListOf( )
-    //datas 수치 -> 1만개로!
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,7 +52,7 @@ class ChatFragment : Fragment(), OnChatRecyclerItemClickListener {
 
         
         //어뎁터 초기화
-        adapter = ChatAdapter(datas, requireContext(), this@ChatFragment)
+        adapter = ChatAdapter(this@ChatFragment)
         recyclerView.adapter = adapter
         
         //어뎁터값을 레이아웃매니저로 넘김
@@ -68,11 +65,8 @@ class ChatFragment : Fragment(), OnChatRecyclerItemClickListener {
         val email = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
             .getString("email", null)
 
-
-        loadChatRoomList()
         return binding.root
     }
-
 
 
     override fun onRecyclerItemClick(email: String, friend: String, chatRoomId: String) {

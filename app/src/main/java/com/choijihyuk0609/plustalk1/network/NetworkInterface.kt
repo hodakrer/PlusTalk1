@@ -56,9 +56,9 @@ interface NetworkInterface {
     ): Call<ChatRoomCreateResponse>
 
     @POST("chatroom/list")
-    fun listChatroom(
+    suspend fun listChatroom(
         @Body chatRoomListRequest: ChatRoomListRequest
-    ): Call<ChatRoomListResponse>
+    ): ChatRoomListResponse
 
     @POST("chatmessage/list-all")
     fun listAllChatMessage(
