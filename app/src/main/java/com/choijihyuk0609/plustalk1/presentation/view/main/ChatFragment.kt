@@ -84,9 +84,9 @@ class ChatFragment : Fragment(), OnChatRecyclerItemClickListener {
 
         // arguments를 설정하기 전에 fragment를 생성
         chatRoomFragment.arguments = bundle
-        //////////Log.d("kkang", "번들을 꺼내봅시다. member: ${bundle.getString("member") }")
-        //////////Log.d("kkang", "번들을 꺼내봅시다. friendName: ${bundle.getString("friend") }")
-        //////////Log.d("kkang", "번들을 꺼내봅시다. chatRoom: ${bundle.getString("chatroomid") }")
+        ////////////Log.d("kkang", "번들을 꺼내봅시다. member: ${bundle.getString("member") }")
+        ////////////Log.d("kkang", "번들을 꺼내봅시다. friendName: ${bundle.getString("friend") }")
+        ////////////Log.d("kkang", "번들을 꺼내봅시다. chatRoom: ${bundle.getString("chatroomid") }")
         // 프래그먼트 교체
         parentFragmentManager.beginTransaction()
             .replace(R.id.container, chatRoomFragment)  // container의 ID로 교체
