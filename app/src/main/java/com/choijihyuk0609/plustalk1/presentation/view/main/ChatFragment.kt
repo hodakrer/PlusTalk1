@@ -43,6 +43,9 @@ class ChatFragment : Fragment(), OnChatRecyclerItemClickListener {
         recyclerView.setRecycledViewPool(pool)
 
         // ViewModel의 LiveData를 관찰
+        viewModel.loadChatRoomList(requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+            .getString("email", null))
+
         viewModel.chatRoom.observe(viewLifecycleOwner, Observer { chatRoom ->
             if (chatRoom.isNotEmpty()) {
                 // RecyclerView 갱신
@@ -62,8 +65,6 @@ class ChatFragment : Fragment(), OnChatRecyclerItemClickListener {
             DividerItemDecoration(requireContext( ),
                 LinearLayoutManager.VERTICAL)
         )
-        val email = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
-            .getString("email", null)
 
         return binding.root
     }
