@@ -20,10 +20,10 @@ class ChatViewModel : ViewModel( ) {
             val email = _email
 
             try {
-                //// suspend 함수를 사용하여 네트워크 요청
+                ///// suspend 함수를 사용하여 네트워크 요청
                 val response = RetrofitInstance.apiService.listChatroom(ChatRoomListRequest(email ?: ""))
 
-                //// 응답 데이터 처리
+                ////// 응답 데이터 처리
                 _chatRoom.value = response.data ?: emptyList()
             } catch (e: Exception) {
                 Log.e("ChatFragmentViewModel", "Network error: ${e.localizedMessage}")
