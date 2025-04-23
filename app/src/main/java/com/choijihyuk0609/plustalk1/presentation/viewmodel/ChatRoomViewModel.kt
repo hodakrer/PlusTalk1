@@ -13,7 +13,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class ChatRoomViewModel(memberEmail: String, memberFriendEmail: String, chatRoomId: String) : ViewModel( ) {
+class ChatRoomViewModel() : ViewModel( ) {
     //memberEmail : String, memberFriendEmail : String, chatRoomId: String
     private val _chatMessages = MutableLiveData<List<ChatMessage>>()
     val chatMessages: LiveData<List<ChatMessage>> = _chatMessages

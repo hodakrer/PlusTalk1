@@ -63,7 +63,7 @@ class ChatRoomFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_chat_room, container, false)
 
         // ViewModel을 Fragment에서 가져옴
-        viewModel = ViewModelProvider(this).get(ChatRoomViewModel :: class.java)
+        viewModel = ViewModelProvider(this).get(ChatRoomViewModel() :: class.java)
 
         //UI 뷰바인딩
         recyclerView = view.findViewById(R.id.recyclerViewChat)
