@@ -20,7 +20,7 @@ class ChatRoomViewModel() : ViewModel( ) {
 
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
-
+    //observe 안해놨잖아..
     fun loadChatMessages(memberEmail: String, chatRoomId: String) {
         val chatMessageListAllRequest = ChatMessageListAllRequest(memberEmail, chatRoomId)
 
