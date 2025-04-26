@@ -24,7 +24,7 @@ import retrofit2.Response
 
 class SignupFragment : Fragment(R.layout.fragment_signup) {
     private lateinit var viewModel : SignupViewModel
-
+    ////
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this).get(SignupViewModel :: class.java)
